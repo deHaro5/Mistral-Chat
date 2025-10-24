@@ -35,6 +35,8 @@ export const translations = {
     copyMessage: 'Copy message',
     copyCode: 'Copy code',
     goToBottom: 'Go to bottom',
+    activateReasoner: 'Activate reasoner',
+    deactivateReasoner: 'Deactivate reasoner',
     
     // Footer
     disclaimer: 'Mistral can make mistakes',
@@ -47,6 +49,18 @@ export const translations = {
     spanish: 'Spanish',
     french: 'French',
     close: 'Close',
+    
+    // Quick Ideas
+    ideaLabel: 'Idea:',
+    idea1: 'Create a Snake game in Python',
+    idea2: 'Write a croissant recipe',
+    idea3: 'Build a todo app with React',
+    idea4: 'Explain binary search',
+    idea5: 'Generate a personal portfolio in Next.js',
+    idea6: 'Optimize an SQL query',
+    idea7: 'Design a REST API spec',
+    idea8: 'Write unit tests with Jest',
+    idea9: 'Create a CSS grid layout',
   },
   es: {
     // Header
@@ -80,6 +94,8 @@ export const translations = {
     copyMessage: 'Copiar mensaje',
     copyCode: 'Copiar código',
     goToBottom: 'Ir al final',
+    activateReasoner: 'Activar razonador',
+    deactivateReasoner: 'Desactivar razonador',
     
     // Footer
     disclaimer: 'Mistral puede cometer errores',
@@ -92,6 +108,18 @@ export const translations = {
     spanish: 'Español',
     french: 'Francés',
     close: 'Cerrar',
+    
+    // Quick Ideas
+    ideaLabel: 'Idea:',
+    idea1: 'Crear un juego Snake en Python',
+    idea2: 'Escribir una receta de croissant',
+    idea3: 'Construir una app de tareas con React',
+    idea4: 'Explicar búsqueda binaria',
+    idea5: 'Generar un portafolio personal en Next.js',
+    idea6: 'Optimizar una consulta SQL',
+    idea7: 'Diseñar una especificación REST API',
+    idea8: 'Escribir pruebas unitarias con Jest',
+    idea9: 'Crear un diseño CSS grid',
   },
   fr: {
     // Header
@@ -125,6 +153,8 @@ export const translations = {
     copyMessage: 'Copier le message',
     copyCode: 'Copier le code',
     goToBottom: 'Aller en bas',
+    activateReasoner: 'Activer le raisonneur',
+    deactivateReasoner: 'Désactiver le raisonneur',
     
     // Footer
     disclaimer: 'Mistral peut faire des erreurs',
@@ -137,6 +167,18 @@ export const translations = {
     spanish: 'Espagnol',
     french: 'Français',
     close: 'Fermer',
+    
+    // Quick Ideas
+    ideaLabel: 'Idée :',
+    idea1: 'Créer un jeu Snake en Python',
+    idea2: 'Écrire une recette de croissant',
+    idea3: 'Construire une app de tâches avec React',
+    idea4: 'Expliquer la recherche binaire',
+    idea5: 'Générer un portfolio personnel en Next.js',
+    idea6: 'Optimiser une requête SQL',
+    idea7: 'Concevoir une spécification REST API',
+    idea8: 'Écrire des tests unitaires avec Jest',
+    idea9: 'Créer une mise en page CSS grid',
   },
 };
 

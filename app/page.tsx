@@ -625,8 +625,8 @@ export default function Home() {
               <button 
                 className={`brain-btn ${useReasoning ? 'active' : ''}`}
                 onClick={() => setUseReasoning(!useReasoning)}
-                title={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
-                aria-label={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
+                title={useReasoning ? t.deactivateReasoner : t.activateReasoner}
+                aria-label={useReasoning ? t.deactivateReasoner : t.activateReasoner}
                 disabled={loading}
               >
                 <PixelBrain />
@@ -651,19 +651,19 @@ export default function Home() {
         {/* Quick Ideas when no messages - outside, below the textbox */}
         {visibleMessages.length === 0 && !loading && (
           <div className="quick-ideas">
-            <div className="quick-ideas-title pixel">Idea:</div>
+            <div className="quick-ideas-title pixel">{t.ideaLabel}</div>
             <div className="quick-ideas-wrapper">
               <div className="quick-ideas-list" ref={ideasRef}>
                 {[
-                  "Create a Snake game in Python",
-                  "Write a croissant recipe",
-                  "Build a todo app with React",
-                  "Explain binary search",
-                  "Generate a personal portfolio in Next.js",
-                  "Optimize an SQL query",
-                  "Design a REST API spec",
-                  "Write unit tests with Jest",
-                  "Create a CSS grid layout",
+                  t.idea1,
+                  t.idea2,
+                  t.idea3,
+                  t.idea4,
+                  t.idea5,
+                  t.idea6,
+                  t.idea7,
+                  t.idea8,
+                  t.idea9,
                 ].map((idea) => (
                   <button
                     key={idea}
