@@ -8,6 +8,10 @@ import PixelBrain from "./components/PixelBrain";
 import PixelClock from "./components/PixelClock";
 import EasterEgg from "./components/EasterEgg";
 import Settings from "./components/Settings";
+import CodeBlock from "./components/CodeBlock";
+import CopyIcon from "./components/CopyIcon";
+import PixelArrow from "./components/PixelArrow";
+import PixelStop from "./components/PixelStop";
 import { Language, translations } from "./lib/translations";
 
 type Role = "user" | "assistant" | "system";
@@ -49,7 +53,7 @@ const MessageBubble = React.memo(({ m, isStreaming, t }: { m: Msg; isStreaming: 
       {/* Razonamiento ARRIBA del mensaje - collapsible */}
       {!isUser && m.thinking && (
         <details className="thinking-wrapper">
-          <summary className="thinking-label pixel">▸ {t.thinking}</summary>
+          <summary className="thinking-label pixel">{t.thinking}</summary>
           <pre className="thinking-panel">{m.thinking}</pre>
         </details>
       )}
@@ -65,7 +69,16 @@ const MessageBubble = React.memo(({ m, isStreaming, t }: { m: Msg; isStreaming: 
         ) : (
           // AI messages: render markdown
           <>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                code: ({ node, className, children, ...props }) => (
+                  <CodeBlock node={node} className={className} {...props}>
+                    {children}
+                  </CodeBlock>
+                ),
+              }}
+            >
               {m.content}
             </ReactMarkdown>
             {isStreaming && <span className="blink-cursor" />}
@@ -81,7 +94,7 @@ const MessageBubble = React.memo(({ m, isStreaming, t }: { m: Msg; isStreaming: 
         aria-label={t.copyMessage}
         title={t.copyMessage}
       >
-        {copied ? "✓" : "⎘"}
+        {copied ? "✓" : <CopyIcon size={14} />}
       </button>
     </div>
   );
@@ -117,6 +130,9 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const ideasRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [showIdeasArrow, setShowIdeasArrow] = useState(false);
   
   const t = translations[language];
 
@@ -227,6 +243,28 @@ export default function Home() {
     inputRef.current?.focus();
   }, []);
 
+  // Check if ideas list has more content to scroll
+  useEffect(() => {
+    const ideasList = ideasRef.current;
+    if (!ideasList) return;
+
+    const checkScroll = () => {
+      const hasOverflow = ideasList.scrollWidth > ideasList.clientWidth;
+      const isAtEnd = ideasList.scrollLeft + ideasList.clientWidth >= ideasList.scrollWidth - 5;
+      setShowIdeasArrow(hasOverflow && !isAtEnd);
+    };
+
+    // Delay check to ensure DOM is rendered
+    setTimeout(checkScroll, 100);
+    ideasList.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll, { passive: true });
+
+    return () => {
+      ideasList.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [messages]);
+
   // Save or update current chat in history (only if not in temporary mode)
   const saveToHistory = (msgs: Msg[]) => {
     if (isTemporaryMode) return; // Don't save if in temporary mode
@@ -264,8 +302,17 @@ export default function Home() {
     }
   };
 
-  async function sendMessage() {
-    const trimmed = input.trim();
+  const cancelMessage = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setStreamingMsgId(null);
+  };
+
+  async function sendMessage(preset?: string) {
+    const trimmed = (preset ?? input).trim();
     if (!trimmed || loading) return;
 
     if (!hasStarted) {
@@ -302,6 +349,9 @@ export default function Home() {
       { role: "assistant", content: "", thinking: "", id: assistantId },
     ]);
 
+    // Create AbortController for this request
+    abortControllerRef.current = new AbortController();
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -310,6 +360,7 @@ export default function Home() {
           useReasoning,
           normalModel: "mistral-small-latest",
         }),
+        signal: abortControllerRef.current.signal,
       });
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
@@ -368,15 +419,19 @@ export default function Home() {
         }
       }
     } catch (e: any) {
-      setMessages((curr) => [
-        ...curr.filter((m) => m.id !== assistantId),
-        { 
-          role: "assistant", 
-          content: `⚠️ Error: ${e?.message || e}`,
-          id: `error-${Date.now()}`
-        },
-      ]);
+      // Don't show error if request was aborted
+      if (e.name !== 'AbortError') {
+        setMessages((curr) => [
+          ...curr.filter((m) => m.id !== assistantId),
+          { 
+            role: "assistant", 
+            content: `⚠️ Error: ${e?.message || e}`,
+            id: `error-${Date.now()}`
+          },
+        ]);
+      }
     } finally {
+      abortControllerRef.current = null;
       setLoading(false);
       setStreamingMsgId(null);
       // Save final state to history
@@ -492,7 +547,7 @@ export default function Home() {
                 onClick={() => setSettingsOpen(true)}
                 title={t.settings}
               >
-                ⚙ {t.settings}
+                <span style={{ fontSize: '16px' }}>⚙</span> {t.settings}
               </button>
             </div>
           </div>
@@ -572,15 +627,63 @@ export default function Home() {
                 onClick={() => setUseReasoning(!useReasoning)}
                 title={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
                 aria-label={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
+                disabled={loading}
               >
                 <PixelBrain />
               </button>
-              <button className="btn pixel" disabled={loading} onClick={sendMessage}>
-                {loading ? "…" : t.send}
-              </button>
+              {loading ? (
+                <button 
+                  className="btn cancel-btn" 
+                  onClick={cancelMessage}
+                  aria-label={t.cancel}
+                  title={t.cancel}
+                >
+                  <PixelStop size={18} />
+                </button>
+              ) : (
+                <button className="btn pixel" onClick={() => sendMessage()}>
+                  {t.send}
+                </button>
+              )}
             </div>
           </div>
         </div>
+        {/* Quick Ideas when no messages - outside, below the textbox */}
+        {visibleMessages.length === 0 && !loading && (
+          <div className="quick-ideas">
+            <div className="quick-ideas-title pixel">Idea:</div>
+            <div className="quick-ideas-wrapper">
+              <div className="quick-ideas-list" ref={ideasRef}>
+                {[
+                  "Create a Snake game in Python",
+                  "Write a croissant recipe",
+                  "Build a todo app with React",
+                  "Explain binary search",
+                  "Generate a personal portfolio in Next.js",
+                  "Optimize an SQL query",
+                  "Design a REST API spec",
+                  "Write unit tests with Jest",
+                  "Create a CSS grid layout",
+                ].map((idea) => (
+                  <button
+                    key={idea}
+                    className="quick-idea"
+                    onClick={() => sendMessage(idea)}
+                    disabled={loading}
+                    title={idea}
+                  >
+                    {idea}
+                  </button>
+                ))}
+              </div>
+              {showIdeasArrow && (
+                <div className="quick-ideas-arrow">
+                  &gt;
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {hasStarted && (
           <div className="disclaimer pixel">
             {t.disclaimer}

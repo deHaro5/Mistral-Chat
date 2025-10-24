@@ -27,11 +27,13 @@ export const translations = {
     // Chat
     inputPlaceholder: 'Write your message…',
     send: 'Send',
+    cancel: 'Cancel',
     generating: 'generating…',
     thinking: 'REASONING',
     
     // Buttons
     copyMessage: 'Copy message',
+    copyCode: 'Copy code',
     goToBottom: 'Go to bottom',
     
     // Footer
@@ -70,11 +72,13 @@ export const translations = {
     // Chat
     inputPlaceholder: 'Escribe tu mensaje…',
     send: 'Enviar',
+    cancel: 'Cancelar',
     generating: 'generando…',
     thinking: 'RAZONAMIENTO',
     
     // Buttons
     copyMessage: 'Copiar mensaje',
+    copyCode: 'Copiar código',
     goToBottom: 'Ir al final',
     
     // Footer
@@ -113,11 +117,13 @@ export const translations = {
     // Chat
     inputPlaceholder: 'Écrivez votre message…',
     send: 'Envoyer',
+    cancel: 'Annuler',
     generating: 'génération…',
     thinking: 'RAISONNEMENT',
     
     // Buttons
     copyMessage: 'Copier le message',
+    copyCode: 'Copier le code',
     goToBottom: 'Aller en bas',
     
     // Footer
