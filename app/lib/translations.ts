@@ -5,7 +5,7 @@ export type Language = 'en' | 'es' | 'fr';
 export const translations = {
   en: {
     // Header
-    chatTitle: 'Chat Mistral',
+    chatTitle: 'Mistral Chat',
     beta: 'beta',
     
     // History sidebar
@@ -48,7 +48,7 @@ export const translations = {
   },
   es: {
     // Header
-    chatTitle: 'Chat Mistral',
+    chatTitle: 'Mistral Chat',
     beta: 'beta',
     
     // History sidebar
@@ -91,7 +91,7 @@ export const translations = {
   },
   fr: {
     // Header
-    chatTitle: 'Chat Mistral',
+    chatTitle: 'Mistral Chat',
     beta: 'bêta',
     
     // History sidebar

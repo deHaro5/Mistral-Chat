@@ -3,7 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Chat Mistral — Pixel Touch",
+  title: "Mistral Chat",
   description: "Chat minimal con toques pixel y modo razonador",
 };
 
