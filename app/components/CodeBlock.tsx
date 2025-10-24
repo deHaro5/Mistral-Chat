@@ -122,8 +122,8 @@ export default function CodeBlock({ children, className, node, ...props }: CodeB
     if (typeof node === 'string') return node;
     if (typeof node === 'number') return String(node);
     if (Array.isArray(node)) return node.map(getTextContent).join('');
-    if (React.isValidElement(node) && node.props.children) {
-      return getTextContent(node.props.children);
+    if (React.isValidElement(node) && (node.props as any).children) {
+      return getTextContent((node.props as any).children);
     }
     return '';
   };
