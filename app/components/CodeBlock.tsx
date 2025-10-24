@@ -57,15 +57,15 @@ SyntaxHighlighter.registerLanguage('py', python);
 // Custom theme matching the chat colors (for hljs)
 const customTheme = {
   'hljs': {
-    display: 'block',
-    overflowX: 'auto',
+    display: 'block' as const,
+    overflowX: 'auto' as const,
     padding: '1em',
     color: '#e5e5e5',
     background: '#222222',
   },
   'hljs-comment': { color: '#6a9955' },
   'hljs-quote': { color: '#6a9955' },
-  'hljs-keyword': { color: '#ff8c42', fontWeight: 'bold' },
+  'hljs-keyword': { color: '#ff8c42', fontWeight: 'bold' as const },
   'hljs-selector-tag': { color: '#ff8c42' },
   'hljs-literal': { color: '#ff8c42' },
   'hljs-name': { color: '#ff8c42' },
@@ -75,7 +75,7 @@ const customTheme = {
   'hljs-regexp': { color: '#d16969' },
   'hljs-link': { color: '#ce9178' },
   'hljs-title': { color: '#4ec9b0' },
-  'hljs-section': { color: '#dcdcaa', fontWeight: 'bold' },
+  'hljs-section': { color: '#dcdcaa', fontWeight: 'bold' as const },
   'hljs-type': { color: '#4ec9b0' },
   'hljs-class': { color: '#4ec9b0' },
   'hljs-number': { color: '#b5cea8' },
@@ -92,8 +92,8 @@ const customTheme = {
   'hljs-addition': { color: '#b5cea8' },
   'hljs-symbol': { color: '#4fc1ff' },
   'hljs-bullet': { color: '#4fc1ff' },
-  'hljs-emphasis': { fontStyle: 'italic' },
-  'hljs-strong': { fontWeight: 'bold' },
+  'hljs-emphasis': { fontStyle: 'italic' as const },
+  'hljs-strong': { fontWeight: 'bold' as const },
 };
 
 interface CodeBlockProps {
