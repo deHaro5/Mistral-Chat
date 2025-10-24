@@ -7,6 +7,8 @@ import PixelCat from "./components/PixelCat";
 import PixelBrain from "./components/PixelBrain";
 import PixelClock from "./components/PixelClock";
 import EasterEgg from "./components/EasterEgg";
+import Settings from "./components/Settings";
+import { Language, translations } from "./lib/translations";
 
 type Role = "user" | "assistant" | "system";
 type Msg = { 
@@ -27,7 +29,7 @@ function TypingDots() {
 }
 
 // Memoized MessageBubble to prevent unnecessary re-renders
-const MessageBubble = React.memo(({ m, isStreaming }: { m: Msg; isStreaming: boolean }) => {
+const MessageBubble = React.memo(({ m, isStreaming, t }: { m: Msg; isStreaming: boolean; t: typeof translations.en }) => {
   if (m.role === "system") return null;
   const isUser = m.role === "user";
   const [copied, setCopied] = React.useState(false);
@@ -47,7 +49,7 @@ const MessageBubble = React.memo(({ m, isStreaming }: { m: Msg; isStreaming: boo
       {/* Razonamiento ARRIBA del mensaje - collapsible */}
       {!isUser && m.thinking && (
         <details className="thinking-wrapper">
-          <summary className="thinking-label pixel">▸ RAZONAMIENTO</summary>
+          <summary className="thinking-label pixel">▸ {t.thinking}</summary>
           <pre className="thinking-panel">{m.thinking}</pre>
         </details>
       )}
@@ -76,8 +78,8 @@ const MessageBubble = React.memo(({ m, isStreaming }: { m: Msg; isStreaming: boo
       <button
         className={`copy-btn ${copied ? "copied" : ""} ${!isUser && isStreaming ? "hidden" : ""}`}
         onClick={handleCopy}
-        aria-label="Copiar mensaje"
-        title="Copiar mensaje"
+        aria-label={t.copyMessage}
+        title={t.copyMessage}
       >
         {copied ? "✓" : "⎘"}
       </button>
@@ -109,10 +111,14 @@ export default function Home() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isTemporaryMode, setIsTemporaryMode] = useState(false);
   const [easterEggActive, setEasterEggActive] = useState(false);
+  const [language, setLanguage] = useState<Language>('en');
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  
+  const t = translations[language];
 
   // Auto-resize textarea when input changes
   useEffect(() => {
@@ -435,8 +441,8 @@ export default function Home() {
         <button 
           className="history-toggle-btn"
           onClick={() => setHistoryOpen(!historyOpen)}
-          aria-label={historyOpen ? "Cerrar historial" : "Abrir historial"}
-          title={historyOpen ? "Cerrar historial" : "Abrir historial"}
+          aria-label={historyOpen ? t.closeHistory : t.openHistory}
+          title={historyOpen ? t.closeHistory : t.openHistory}
         >
           {historyOpen ? '✕' : '☰'}
         </button>
@@ -445,8 +451,8 @@ export default function Home() {
           <button
             className="new-chat-sidebar-btn"
             onClick={newChat}
-            aria-label="Nuevo chat"
-            title="Nuevo chat"
+            aria-label={t.newChatSidebar}
+            title={t.newChatSidebar}
           >
             +
           </button>
@@ -455,18 +461,18 @@ export default function Home() {
         {historyOpen && (
           <div className="history-content">
             <div className="history-header">
-              <h2 className="pixel">Historial</h2>
+              <h2 className="pixel">{t.history}</h2>
               <button 
                 className="new-chat-btn pixel"
                 onClick={newChat}
-                title="Nuevo chat"
+                title={t.newChatSidebar}
               >
-                + Nuevo
+                {t.newChat}
               </button>
             </div>
             <div className="history-list">
               {chatHistories.length === 0 ? (
-                <div className="no-history">Sin historiales</div>
+                <div className="no-history">{t.noHistory}</div>
               ) : (
                 chatHistories.map(chat => (
                   <button
@@ -479,6 +485,15 @@ export default function Home() {
                   </button>
                 ))
               )}
+            </div>
+            <div className="history-footer">
+              <button
+                className="settings-btn pixel"
+                onClick={() => setSettingsOpen(true)}
+                title={t.settings}
+              >
+                ⚙ {t.settings}
+              </button>
             </div>
           </div>
         )}
@@ -494,14 +509,14 @@ export default function Home() {
             >
               <PixelCat />
             </div>
-            <strong className="title">Chat Mistral</strong>
-            <span className="badge pixel">beta</span>
+            <strong className="title">{t.chatTitle}</strong>
+            <span className="badge pixel">{t.beta}</span>
           </div>
           <button
             className={`temporary-mode-btn ${isTemporaryMode ? 'active' : ''}`}
             onClick={toggleTemporaryMode}
-            title={isTemporaryMode ? "Desactivar modo temporal" : "Activar modo temporal"}
-            aria-label={isTemporaryMode ? "Desactivar modo temporal" : "Activar modo temporal"}
+            title={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
+            aria-label={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
           >
             <PixelClock />
           </button>
@@ -512,9 +527,9 @@ export default function Home() {
           {/* Temporary mode message when no messages */}
           {isTemporaryMode && visibleMessages.length === 0 && !loading && (
             <div className="temporary-mode-info">
-              <div className="temporary-mode-title pixel">⏱ Modo temporal activado</div>
+              <div className="temporary-mode-title pixel">{t.temporaryModeTitle}</div>
               <div className="temporary-mode-subtitle">
-                Este chat no se guardará en el historial. Perfecto para conversaciones privadas o pruebas rápidas.
+                {t.temporaryModeSubtitle}
               </div>
             </div>
           )}
@@ -524,10 +539,11 @@ export default function Home() {
               key={m.id} 
               m={m} 
               isStreaming={loading && m.id === streamingMsgId}
+              t={t}
             />
           ))}
           {loading && visibleMessages.length === 0 && (
-            <div className="muted pixel">generando…</div>
+            <div className="muted pixel">{t.generating}</div>
           )}
         </div>
         <div ref={bottomRef} />
@@ -547,27 +563,27 @@ export default function Home() {
                   sendMessage();
                 }
               }}
-              placeholder="Escribe tu mensaje…"
+              placeholder={t.inputPlaceholder}
               rows={1}
             />
             <div className="buttons-row">
               <button 
                 className={`brain-btn ${useReasoning ? 'active' : ''}`}
                 onClick={() => setUseReasoning(!useReasoning)}
-                title={useReasoning ? "Desactivar razonador" : "Activar razonador"}
-                aria-label={useReasoning ? "Desactivar razonador" : "Activar razonador"}
+                title={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
+                aria-label={useReasoning ? "Deactivate reasoner" : "Activate reasoner"}
               >
                 <PixelBrain />
               </button>
               <button className="btn pixel" disabled={loading} onClick={sendMessage}>
-                {loading ? "…" : "Enviar"}
+                {loading ? "…" : t.send}
               </button>
             </div>
           </div>
         </div>
         {hasStarted && (
           <div className="disclaimer pixel">
-            Mistral puede cometer errores
+            {t.disclaimer}
           </div>
         )}
       </div>
@@ -577,8 +593,8 @@ export default function Home() {
         <button
           className="scroll-to-bottom-btn"
           onClick={scrollToBottom}
-          aria-label="Ir al final"
-          title="Ir al final"
+          aria-label={t.goToBottom}
+          title={t.goToBottom}
         >
           ↓
         </button>
@@ -588,6 +604,14 @@ export default function Home() {
       <EasterEgg 
         active={easterEggActive} 
         onComplete={() => setEasterEggActive(false)} 
+      />
+      
+      {/* Settings */}
+      <Settings
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        language={language}
+        onLanguageChange={setLanguage}
       />
       </div>
     </main>
