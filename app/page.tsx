@@ -12,6 +12,7 @@ import CodeBlock from "./components/CodeBlock";
 import CopyIcon from "./components/CopyIcon";
 import PixelArrow from "./components/PixelArrow";
 import PixelStop from "./components/PixelStop";
+import MobileHeader from "./components/MobileHeader";
 import { Language, translations } from "./lib/translations";
 
 type Role = "user" | "assistant" | "system";
@@ -126,6 +127,7 @@ export default function Home() {
   const [easterEggActive, setEasterEggActive] = useState(false);
   const [language, setLanguage] = useState<Language>('en');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLElement>(null);
@@ -241,6 +243,19 @@ export default function Home() {
 
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+    
+    checkMobile();
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    mediaQuery.addEventListener('change', checkMobile);
+    
+    return () => mediaQuery.removeEventListener('change', checkMobile);
   }, []);
 
   // Check if ideas list has more content to scroll
@@ -491,6 +506,15 @@ export default function Home() {
 
   return (
     <main className={`app ${historyOpen ? 'history-open' : ''}`} ref={containerRef}>
+      {/* Overlay for mobile when history is open */}
+      {isMobile && historyOpen && (
+        <div 
+          className="mobile-overlay" 
+          onClick={() => setHistoryOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+      
       {/* Sidebar with history */}
       <aside className={`history-sidebar ${historyOpen ? 'open' : ''}`}>
         <button 
@@ -555,27 +579,40 @@ export default function Home() {
       </aside>
 
       <div className="main-content">
-        <header className="header">
-          <div className="header-content">
-            <div 
-              onClick={handleCatClick} 
-              style={{ cursor: 'pointer', display: 'inline-flex' }}
-              title="🐱"
-            >
-              <PixelCat />
+        {isMobile ? (
+          <MobileHeader
+            historyOpen={historyOpen}
+            setHistoryOpen={setHistoryOpen}
+            hasStarted={hasStarted}
+            isTemporaryMode={isTemporaryMode}
+            onNewChat={newChat}
+            onToggleTemporary={toggleTemporaryMode}
+            onCatClick={handleCatClick}
+            language={language}
+          />
+        ) : (
+          <header className="header">
+            <div className="header-content">
+              <div 
+                onClick={handleCatClick} 
+                style={{ cursor: 'pointer', display: 'inline-flex' }}
+                title="🐱"
+              >
+                <PixelCat />
+              </div>
+              <strong className="title">{t.chatTitle}</strong>
+              <span className="badge pixel">{t.beta}</span>
             </div>
-            <strong className="title">{t.chatTitle}</strong>
-            <span className="badge pixel">{t.beta}</span>
-          </div>
-          <button
-            className={`temporary-mode-btn ${isTemporaryMode ? 'active' : ''}`}
-            onClick={toggleTemporaryMode}
-            title={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
-            aria-label={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
-          >
-            <PixelClock />
-          </button>
-        </header>
+            <button
+              className={`temporary-mode-btn ${isTemporaryMode ? 'active' : ''}`}
+              onClick={toggleTemporaryMode}
+              title={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
+              aria-label={isTemporaryMode ? t.deactivateTemporary : t.activateTemporary}
+            >
+              <PixelClock />
+            </button>
+          </header>
+        )}
 
       <section ref={chatRef} className={`chat ${hasMessages ? 'has-messages' : ''}`}>
         <div className="messages-wrapper">
@@ -613,7 +650,8 @@ export default function Home() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
+                // Only send on Enter in desktop, not mobile
+                if (e.key === "Enter" && !e.shiftKey && !isMobile) {
                   e.preventDefault();
                   sendMessage();
                 }
@@ -642,7 +680,7 @@ export default function Home() {
                 </button>
               ) : (
                 <button className="btn pixel" onClick={() => sendMessage()}>
-                  {t.send}
+                  {isMobile ? <PixelArrow size={20} direction="right" /> : t.send}
                 </button>
               )}
             </div>

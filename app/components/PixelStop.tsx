@@ -17,3 +17,4 @@ export default function PixelStop({ size = 16, color = "currentColor" }: { size?
   );
 }
 
+

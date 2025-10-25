@@ -32,17 +32,25 @@ export default function EasterEgg({ active, onComplete }: { active: boolean; onC
       }));
       setCats(newCats);
 
-      // Clear cats after animation
-      const timeout = setTimeout(() => {
-        handleClose();
+      // Clear cats AFTER the CSS animation completes (6s) but BEFORE unmounting
+      const clearCatsTimeout = setTimeout(() => {
+        setCats([]);
       }, 6000);
 
-      return () => clearTimeout(timeout);
+      // Call onComplete slightly after to ensure clean unmount
+      const completeTimeout = setTimeout(() => {
+        onComplete();
+      }, 6100);
+
+      return () => {
+        clearTimeout(clearCatsTimeout);
+        clearTimeout(completeTimeout);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
-  if (!active) return null;
+  if (!active && cats.length === 0) return null;
 
   return (
     <>

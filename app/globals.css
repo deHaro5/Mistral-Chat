@@ -959,6 +959,7 @@ body{
     rgba(251, 7, 217, 0.15)
   );
   animation:rainbowRotate 2s linear infinite, overlayFadeOut 6s ease-out forwards;
+  animation-fill-mode:forwards;
 }
 
 .easter-egg-overlay.closing{
@@ -981,8 +982,13 @@ body{
   70%{
     opacity:1;
   }
+  99.9%{
+    opacity:0;
+  }
   100%{
     opacity:0;
+    visibility:hidden;
+    display:none;
   }
 }
 
@@ -1005,6 +1011,7 @@ body{
   z-index:9999;
   overflow:hidden;
   animation:containerFadeOut 6s ease-out forwards;
+  animation-fill-mode:forwards;
 }
 
 .easter-egg-container.closing{
@@ -1018,8 +1025,13 @@ body{
   80%{
     opacity:1;
   }
+  99.9%{
+    opacity:0;
+  }
   100%{
     opacity:0;
+    visibility:hidden;
+    display:none;
   }
 }
 
@@ -1044,6 +1056,7 @@ body{
   0%{
     transform:translateY(100px) rotate(0deg) scale(1);
     opacity:0;
+    visibility:visible;
   }
   8%{
     opacity:1;
@@ -1055,9 +1068,15 @@ body{
   85%{
     opacity:1;
   }
+  99.8%{
+    transform:translateY(-120vh) rotate(720deg) scale(0.8);
+    opacity:0;
+  }
   100%{
     transform:translateY(-120vh) rotate(720deg) scale(0.8);
     opacity:0;
+    visibility:hidden;
+    display:none;
   }
 }
 
@@ -1384,4 +1403,387 @@ body{
 .code-block-wrapper pre code{
   background:none;
   padding:0;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Prevent body scroll on mobile - only chat area scrolls */
+  body {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+  }
+
+  .app {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Hide desktop header on mobile */
+  .header {
+    display: none !important;
+  }
+
+  /* Mobile Header */
+  .mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: var(--panel2);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.75rem;
+    z-index: 99;
+  }
+
+  /* Mobile overlay when sidebar is open */
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 199;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .mobile-menu-btn,
+  .mobile-action-btn {
+    min-width: 44px;
+    min-height: 44px;
+    background: transparent;
+    border: none;
+    color: var(--fg);
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-radius: 8px;
+  }
+
+  .mobile-menu-btn:active,
+  .mobile-action-btn:active {
+    background: var(--panel);
+    transform: scale(0.95);
+  }
+
+  .mobile-action-btn.active {
+    color: var(--accent);
+  }
+
+  .mobile-header-center {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .mobile-title {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Main content with mobile header */
+  .main-content {
+    margin-left: 0 !important;
+    padding-top: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Chat area - ONLY this scrolls on mobile */
+  .chat {
+    padding: 0.5rem 0;
+    padding-bottom: 200px;
+    flex: 1;
+    overflow-y: scroll !important;
+    overflow-x: hidden;
+    margin-top: 56px;
+    margin-bottom: 0;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    min-height: 0;
+  }
+
+  .chat.has-messages {
+    padding-bottom: 200px;
+  }
+
+  /* Ensure messages wrapper doesn't affect layout when empty */
+  .messages-wrapper:empty {
+    min-height: 0;
+  }
+
+  /* Input box - ALWAYS fixed at bottom on mobile */
+  .chat-container.centered,
+  .chat-container.active {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 100;
+    background: var(--bg);
+    overflow: hidden !important;
+  }
+
+  /* Override centered state completely in mobile */
+  .chat-container.centered {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+  }
+
+  .input-box {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 0.75rem;
+    background: var(--panel2);
+  }
+
+  /* Input wrapper - horizontal layout on mobile */
+  .input-wrapper {
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  /* Textarea takes most space */
+  .input {
+    font-size: 16px !important;
+    border-radius: 8px;
+    flex: 1;
+    min-height: 44px;
+    height: 44px;
+    max-height: 100px;
+    padding: 0.65rem 0.75rem;
+    line-height: 1.4;
+  }
+
+  /* Buttons row - horizontal next to input */
+  .buttons-row {
+    flex-direction: row;
+    gap: 0.4rem;
+    align-items: stretch;
+    margin-bottom: 0;
+  }
+
+  /* Brain button - same height as input */
+  .brain-btn {
+    min-width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0.5rem;
+    box-shadow: 0 1px 0 var(--line2);
+    flex-shrink: 0;
+  }
+
+  .brain-btn.active {
+    box-shadow: 0 1px 0 var(--accent-dim), 0 0 0 1px var(--accent) inset;
+  }
+
+  /* Send/Cancel button - same height as input */
+  .btn {
+    min-width: 44px;
+    min-height: 44px;
+    height: 44px;
+    padding: 0.5rem;
+    font-size: 0;
+    box-shadow: 0 1px 0 var(--accent-dim);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn::before {
+    content: '';
+    font-size: 14px;
+  }
+
+  .cancel-btn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    box-shadow: 0 1px 0 #b8653a !important;
+  }
+
+  /* Quick ideas - ABOVE input on mobile */
+  .quick-ideas {
+    order: -1;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    padding: 0 0.75rem;
+    background: var(--bg);
+  }
+
+  .quick-ideas-title {
+    margin-bottom: 0.4rem;
+    font-size: 9px;
+  }
+
+  .quick-idea {
+    font-size: 11px;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .quick-ideas-arrow {
+    padding: 0.3rem 0.75rem 0.3rem 2.5rem;
+    background: linear-gradient(to right, transparent, var(--bg) 40%, var(--bg));
+  }
+
+  .chat-container .input-box {
+    order: 1;
+  }
+
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .disclaimer {
+    order: 2;
+    font-size: 8px;
+    padding: 0.4rem 0.5rem;
+    margin: 0;
+    background: var(--bg);
+  }
+
+  /* Sidebar - HIDDEN by default on mobile, only visible when open */
+  .history-sidebar {
+    width: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .history-sidebar.open {
+    width: 80%;
+    max-width: 280px;
+    transform: translateX(0);
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+  }
+
+  /* Hide sidebar toggle and new chat buttons in mobile (we use MobileHeader) */
+  .history-toggle-btn,
+  .new-chat-sidebar-btn {
+    display: none !important;
+  }
+
+  /* Fix settings button cutoff */
+  .history-footer {
+    padding: 1rem;
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 1.5rem);
+  }
+
+  /* Adjust main content margin when history is open */
+  .app.history-open .main-content {
+    margin-left: 0 !important;
+  }
+
+  /* Scroll to bottom button position */
+  .scroll-to-bottom-btn {
+    bottom: 130px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .app.history-open .scroll-to-bottom-btn {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Adjust chat container when history is open */
+  .app.history-open .chat-container.centered,
+  .app.history-open .chat-container.active {
+    left: 0 !important;
+    transform: none !important;
+  }
+
+  /* Messages wrapper */
+  .messages-wrapper {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+
+  /* Bubbles adjustments */
+  .bubble.user {
+    max-width: 85%;
+  }
+
+  /* Temporary mode info */
+  .temporary-mode-info {
+    padding: 1.5rem 1rem;
+    margin: 1rem auto;
+    max-width: 100%;
+  }
+
+  .temporary-mode-title {
+    font-size: 12px;
+  }
+
+  .temporary-mode-subtitle {
+    font-size: 12px;
+    max-width: 100%;
+  }
+
+  /* Settings modal on mobile */
+  .settings-modal {
+    width: 95%;
+    max-height: 90vh;
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 1rem;
+  }
+
+  /* Code blocks on mobile */
+  .code-block-wrapper {
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
+    border-radius: 0;
+  }
+
+  .code-block-header {
+    border-radius: 0;
+  }
+
+  .code-block-wrapper pre {
+    border-radius: 0 !important;
+  }
 }
