@@ -245,17 +245,39 @@ export default function Home() {
     inputRef.current?.focus();
   }, []);
 
-  // Detect mobile device
+  // Detect mobile device - ONLY on mount, no listeners to avoid freezes
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    };
-    
-    checkMobile();
-    const mediaQuery = window.matchMedia("(max-width: 768px)");
-    mediaQuery.addEventListener('change', checkMobile);
-    
-    return () => mediaQuery.removeEventListener('change', checkMobile);
+    // Check ONLY once on mount
+    const isMobileDevice = window.matchMedia("(max-width: 768px)").matches;
+    setIsMobile(isMobileDevice);
+
+    // Fix viewport layout when keyboard opens/closes
+    if (isMobileDevice && 'visualViewport' in window) {
+      const handleViewportChange = () => {
+        const chat = chatRef.current;
+        const visualViewport = window.visualViewport;
+        
+        if (chat && visualViewport) {
+          // Force chat to recalculate its scroll height
+          requestAnimationFrame(() => {
+            chat.style.height = 'auto';
+            void chat.offsetHeight; // Force reflow
+            chat.style.height = '';
+            
+            // Scroll to maintain position
+            if (bottomRef.current) {
+              bottomRef.current.scrollIntoView({ behavior: 'auto' });
+            }
+          });
+        }
+      };
+
+      window.visualViewport?.addEventListener('resize', handleViewportChange);
+      
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      };
+    }
   }, []);
 
   // Check if ideas list has more content to scroll
@@ -272,13 +294,19 @@ export default function Home() {
     // Delay check to ensure DOM is rendered
     setTimeout(checkScroll, 100);
     ideasList.addEventListener('scroll', checkScroll, { passive: true });
-    window.addEventListener('resize', checkScroll, { passive: true });
+    
+    // Only add resize listener on desktop to avoid freezes on mobile
+    if (!isMobile) {
+      window.addEventListener('resize', checkScroll, { passive: true });
+    }
 
     return () => {
       ideasList.removeEventListener('scroll', checkScroll);
-      window.removeEventListener('resize', checkScroll);
+      if (!isMobile) {
+        window.removeEventListener('resize', checkScroll);
+      }
     };
-  }, [messages]);
+  }, [messages, isMobile]);
 
   // Save or update current chat in history (only if not in temporary mode)
   const saveToHistory = (msgs: Msg[]) => {
@@ -662,7 +690,14 @@ export default function Home() {
             <div className="buttons-row">
               <button 
                 className={`brain-btn ${useReasoning ? 'active' : ''}`}
-                onClick={() => setUseReasoning(!useReasoning)}
+                onClick={(e) => {
+                  setUseReasoning(!useReasoning);
+                  // Remove focus on mobile to prevent stuck focus state
+                  if (isMobile) {
+                    const button = e.currentTarget;
+                    setTimeout(() => button.blur(), 10);
+                  }
+                }}
                 title={useReasoning ? t.deactivateReasoner : t.activateReasoner}
                 aria-label={useReasoning ? t.deactivateReasoner : t.activateReasoner}
                 disabled={loading}
@@ -672,14 +707,29 @@ export default function Home() {
               {loading ? (
                 <button 
                   className="btn cancel-btn" 
-                  onClick={cancelMessage}
+                  onClick={(e) => {
+                    cancelMessage();
+                    if (isMobile) {
+                      const button = e.currentTarget;
+                      setTimeout(() => button.blur(), 10);
+                    }
+                  }}
                   aria-label={t.cancel}
                   title={t.cancel}
                 >
                   <PixelStop size={18} />
                 </button>
               ) : (
-                <button className="btn pixel" onClick={() => sendMessage()}>
+                <button 
+                  className="btn pixel" 
+                  onClick={(e) => {
+                    sendMessage();
+                    if (isMobile) {
+                      const button = e.currentTarget;
+                      setTimeout(() => button.blur(), 10);
+                    }
+                  }}
+                >
                   {isMobile ? <PixelArrow size={20} direction="right" /> : t.send}
                 </button>
               )}

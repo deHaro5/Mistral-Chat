@@ -1411,18 +1411,24 @@ body{
 
 @media (max-width: 768px) {
   /* Prevent body scroll on mobile - only chat area scrolls */
-  body {
+  html {
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     width: 100%;
   }
 
+  body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+
   .app {
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     overflow: hidden;
     position: relative;
+    touch-action: manipulation;
   }
 
   /* Hide desktop header on mobile */
@@ -1501,8 +1507,7 @@ body{
   .main-content {
     margin-left: 0 !important;
     padding-top: 0;
-    height: 100vh;
-    height: 100dvh;
+    height: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1521,6 +1526,8 @@ body{
     -webkit-overflow-scrolling: touch;
     position: relative;
     min-height: 0;
+    pointer-events: auto;
+    touch-action: pan-y;
   }
 
   .chat.has-messages {
@@ -1545,9 +1552,11 @@ body{
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
-    z-index: 100;
+    z-index: 1000 !important;
     background: var(--bg);
-    overflow: hidden !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    touch-action: manipulation;
   }
 
   /* Override centered state completely in mobile */
@@ -1564,6 +1573,9 @@ body{
     border-bottom: none;
     padding: 0.75rem;
     background: var(--panel2);
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
   }
 
   /* Input wrapper - horizontal layout on mobile */
@@ -1571,6 +1583,9 @@ body{
     flex-direction: row;
     gap: 0.5rem;
     align-items: stretch;
+    pointer-events: auto;
+    position: relative;
+    z-index: 1001;
   }
 
   /* Textarea takes most space */
@@ -1583,6 +1598,9 @@ body{
     max-height: 100px;
     padding: 0.65rem 0.75rem;
     line-height: 1.4;
+    pointer-events: auto;
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* Buttons row - horizontal next to input */
@@ -1591,6 +1609,9 @@ body{
     gap: 0.4rem;
     align-items: stretch;
     margin-bottom: 0;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1002 !important;
   }
 
   /* Brain button - same height as input */
@@ -1601,10 +1622,61 @@ body{
     padding: 0.5rem;
     box-shadow: 0 1px 0 var(--line2);
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation !important;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1003 !important;
+    outline: none;
+    border-color: var(--line2);
+  }
+
+  .brain-btn:focus {
+    outline: none;
+    border-color: var(--line2);
+    box-shadow: 0 1px 0 var(--line2);
+  }
+
+  .brain-btn:focus-visible {
+    outline: none;
+  }
+
+  .brain-btn:hover {
+    transform: none;
+    box-shadow: 0 1px 0 var(--line2);
+    border-color: var(--line2);
+  }
+
+  .brain-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 0 var(--line2);
   }
 
   .brain-btn.active {
     box-shadow: 0 1px 0 var(--accent-dim), 0 0 0 1px var(--accent) inset;
+    border-color: var(--accent);
+  }
+
+  .brain-btn.active:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 1px 0 var(--accent-dim), 0 0 0 1px var(--accent) inset;
+  }
+
+  .brain-btn.active:hover {
+    transform: none;
+    box-shadow: 0 1px 0 var(--accent-dim), 0 0 0 1px var(--accent) inset;
+  }
+
+  .brain-btn.active:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 0 var(--accent-dim), 0 0 0 1px var(--accent) inset;
+  }
+  
+  /* Remove focus styles when not active */
+  .brain-btn:not(.active):focus {
+    border-color: var(--line2);
+    box-shadow: 0 1px 0 var(--line2);
   }
 
   /* Send/Cancel button - same height as input */
@@ -1619,6 +1691,12 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation !important;
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 1003 !important;
+    outline: none;
   }
 
   .btn::before {
@@ -1626,11 +1704,37 @@ body{
     font-size: 14px;
   }
 
+  .btn:focus {
+    outline: none;
+  }
+
+  .btn:focus-visible {
+    outline: none;
+  }
+
+  .btn:hover {
+    transform: none;
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: 0 0 0 var(--accent-dim);
+  }
+
   .cancel-btn {
     min-width: 44px !important;
     min-height: 44px !important;
     height: 44px !important;
     box-shadow: 0 1px 0 #b8653a !important;
+  }
+
+  .cancel-btn:focus {
+    outline: none;
+  }
+
+  .cancel-btn:active {
+    transform: translateY(1px) !important;
+    box-shadow: 0 0 0 #b8653a !important;
   }
 
   /* Quick ideas - ABOVE input on mobile */
